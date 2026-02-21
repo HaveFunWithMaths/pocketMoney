@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { PlusCircle, Users, BookOpen } from 'lucide-react'
+import { PlusCircle, Users, BookOpen, UserCircle } from 'lucide-react'
+import { cookies } from 'next/headers'
 
 export default async function Dashboard() {
   const teacherCount = await prisma.person.count({ where: { role: 'TEACHER' } })
@@ -18,11 +19,33 @@ export default async function Dashboard() {
   const expenses = await prisma.expense.findMany()
   const totalDebt = expenses.reduce((sum: number, exp: any) => sum + exp.amount, 0)
 
+  const cookieStore = await cookies()
+  const token = cookieStore.get('auth_token')?.value
+  const currentTeacherName = token ? `${token} Pr` : null
+
+  let myTeacherId = null
+  if (currentTeacherName) {
+    const teacher = await prisma.person.findFirst({
+      where: { name: currentTeacherName, role: 'TEACHER' }
+    })
+    if (teacher) myTeacherId = teacher.id
+  }
+
   const quickLinks = [
     { label: 'Add Expense', href: '/add-expense', icon: PlusCircle, color: 'text-blue-500', bg: 'bg-blue-50' },
     { label: 'Manage Teachers', href: '/manage/teachers', icon: BookOpen, color: 'text-indigo-500', bg: 'bg-indigo-50' },
     { label: 'Manage Students', href: '/manage/students', icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-50' },
   ]
+
+  if (myTeacherId) {
+    quickLinks.unshift({
+      label: 'My Expenses',
+      href: `/profile/teacher/${myTeacherId}`,
+      icon: UserCircle,
+      color: 'text-purple-500',
+      bg: 'bg-purple-50'
+    })
+  }
 
   return (
     <div className="p-4 space-y-6 pb-20">

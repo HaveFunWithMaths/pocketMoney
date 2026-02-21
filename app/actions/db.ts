@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { addRecordToSheet } from '@/lib/googleSheets'
 
 export async function addPerson(formData: FormData) {
     const name = formData.get('name') as String
@@ -53,6 +54,21 @@ export async function addExpense(formData: FormData) {
                 amount,
                 description: formData.get('description') as string | undefined
             },
+            include: {
+                debtor: true,
+                creditor: true
+            }
+        })
+
+        // Log to Google Sheets
+        await addRecordToSheet({
+            'Date': expense.createdAt.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+            'Action': 'ADDED',
+            'Expense ID': expense.id,
+            'Creditor (Who made the expense?)': expense.creditor.name,
+            'Debtor (Who owes money?)': expense.debtor.name,
+            'Amount': expense.amount,
+            'Description': expense.description || ''
         })
         revalidatePath('/')
         revalidatePath(`/profile/teacher/${creditorId}`)
@@ -110,7 +126,22 @@ export async function editExpense(id: string, formData: FormData) {
     try {
         const expense = await prisma.expense.update({
             where: { id },
-            data: { amount, description: description || null }
+            data: { amount, description: description || null },
+            include: {
+                debtor: true,
+                creditor: true
+            }
+        })
+
+        // Log edit to Google Sheets
+        await addRecordToSheet({
+            'Date': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+            'Action': 'EDITED',
+            'Expense ID': expense.id,
+            'Creditor (Who made the expense?)': expense.creditor.name,
+            'Debtor (Who owes money?)': expense.debtor.name,
+            'Amount': expense.amount,
+            'Description': expense.description || ''
         })
         revalidatePath('/')
         revalidatePath(`/profile/teacher/${expense.creditorId}`)
@@ -123,8 +154,23 @@ export async function editExpense(id: string, formData: FormData) {
 
 export async function deleteExpense(id: string) {
     try {
-        await prisma.expense.delete({
-            where: { id }
+        const expense = await prisma.expense.delete({
+            where: { id },
+            include: {
+                debtor: true,
+                creditor: true
+            }
+        })
+
+        // Log delete to Google Sheets
+        await addRecordToSheet({
+            'Date': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+            'Action': 'DELETED',
+            'Expense ID': expense.id,
+            'Creditor (Who made the expense?)': expense.creditor.name,
+            'Debtor (Who owes money?)': expense.debtor.name,
+            'Amount': expense.amount,
+            'Description': expense.description || ''
         })
         revalidatePath('/')
         // We could extract the debtor/creditor ID and revalidate profiles if needed.

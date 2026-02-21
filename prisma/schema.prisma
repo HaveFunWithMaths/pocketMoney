@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Person {
+  id               String    @id @default(uuid())
+  name             String
+  role             String    // Since SQLite doesn't natively support Enums well, mapping to String but validating in logic
+  createdAt        DateTime  @default(now())
+  expensesAsDebtor Expense[] @relation("DebtorRelation")
+  expensesAsCred   Expense[] @relation("CreditorRelation")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  amount      Float
+  debtorId    String
+  creditorId  String
+  description String?
+  createdAt   DateTime @default(now())
+
+  debtor   Person @relation("DebtorRelation", fields: [debtorId], references: [id])
+  creditor Person @relation("CreditorRelation", fields: [creditorId], references: [id])
+}

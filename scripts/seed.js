@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 async function main() {
     console.log('Starting seed...')
 
-    const teachers = ['Ninad Pr', 'Brajesh Pr', 'Tirumala Pr']
+    const teachers = ['Ninad Pr', 'Brajesh Pr', 'Thirumala Pr', 'Saurabh Pr']
 
     for (const t of teachers) {
         await prisma.person.upsert({

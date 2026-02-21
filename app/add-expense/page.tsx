@@ -3,15 +3,21 @@ import { addExpense } from '@/app/actions/db'
 import Link from 'next/link'
 import { ArrowLeft, Send } from 'lucide-react'
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { SearchableSelect } from './SearchableSelect'
 
 export default async function AddExpense() {
+    const cookieStore = await cookies()
+    const currentUser = cookieStore.get('auth_token')?.value
+
     const people = await prisma.person.findMany({
         orderBy: { name: 'asc' }
     })
 
     const teachers = people.filter((p: any) => p.role === 'TEACHER')
     const students = people.filter((p: any) => p.role === 'STUDENT')
+
+    const currentUserPr = teachers.find((t: any) => t.name.startsWith(currentUser))
 
     return (
         <div className="p-4 space-y-6 pb-20">
@@ -29,7 +35,7 @@ export default async function AddExpense() {
                     redirect('/')
                 }} className="space-y-5">
                     <div className="space-y-2 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                        <label htmlFor="debtorId" className="text-sm font-semibold text-slate-800">Who owes money? (Student)</label>
+                        <label htmlFor="debtorId" className="text-sm font-semibold text-slate-800">For whom the expense is made?(Student)</label>
                         <SearchableSelect
                             name="debtorId"
                             options={students}
@@ -39,19 +45,23 @@ export default async function AddExpense() {
                     </div>
 
                     <div className="space-y-2 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                        <label htmlFor="creditorId" className="text-sm font-semibold text-slate-800">Who is owed money? (Teacher)</label>
+                        <label htmlFor="creditorId" className="text-sm font-semibold text-slate-800">Who made the expense(Teacher)?</label>
                         <select
                             name="creditorId"
                             id="creditorId"
                             required
-                            defaultValue=""
-                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            defaultValue={currentUserPr ? currentUserPr.id : ""}
+                            disabled={currentUser !== 'Ninad'}
+                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-60 disabled:bg-slate-200"
                         >
                             <option value="" disabled>Select a teacher</option>
                             {teachers.map((t: any) => (
                                 <option key={t.id} value={t.id}>{t.name}</option>
                             ))}
                         </select>
+                        {currentUser !== 'Ninad' && currentUserPr && (
+                            <input type="hidden" name="creditorId" value={currentUserPr.id} />
+                        )}
                     </div>
 
                     <div className="space-y-2">

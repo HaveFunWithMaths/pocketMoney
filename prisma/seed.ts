@@ -6,7 +6,8 @@ async function main() {
     const teachers = [
         { name: 'Ninad Pr', role: 'TEACHER' },
         { name: 'Brajesh Pr', role: 'TEACHER' },
-        { name: 'Tirumala Pr', role: 'TEACHER' },
+        { name: 'Thirumala Pr', role: 'TEACHER' },
+        { name: 'Saurabh Pr', role: 'TEACHER' },
     ]
 
     console.log(`Start seeding ...`)

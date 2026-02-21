@@ -3,15 +3,16 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
     const token = request.cookies.get('auth_token')?.value
+    const validTokens = ['Ninad', 'Brajesh', 'Thirumala', 'Saurabh']
 
     if (request.nextUrl.pathname.startsWith('/login')) {
-        if (token === 'authenticated') {
+        if (token && validTokens.includes(token)) {
             return NextResponse.redirect(new URL('/', request.url))
         }
         return NextResponse.next()
     }
 
-    if (token !== 'authenticated') {
+    if (!token || !validTokens.includes(token)) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 

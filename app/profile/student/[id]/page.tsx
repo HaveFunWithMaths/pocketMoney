@@ -72,7 +72,7 @@ export default async function StudentProfile({ params }: { params: Promise<{ id:
             <div className="space-y-3">
                 <h3 className="font-semibold text-slate-900 px-1 flex items-center gap-2">
                     <Receipt className="w-4 h-4 text-slate-400" />
-                    Recent Transactions
+                    All transactions
                 </h3>
                 <ul className="space-y-2">
                     {student.expensesAsDebtor.map((exp: any) => (
@@ -83,7 +83,11 @@ export default async function StudentProfile({ params }: { params: Promise<{ id:
                                 {exp.description && <p className="text-xs text-slate-400 mt-0.5">{exp.description}</p>}
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-semibold text-red-500">-₹{exp.amount}</span>
+                                {exp.amount < 0 ? (
+                                    <span className="text-sm font-semibold text-emerald-500">+₹{Math.abs(exp.amount)}</span>
+                                ) : (
+                                    <span className="text-sm font-semibold text-red-500">-₹{exp.amount}</span>
+                                )}
                                 <Link href={`/edit/expense/${exp.id}`} className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded transition-colors hidden group-hover:block">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /></svg>
                                 </Link>

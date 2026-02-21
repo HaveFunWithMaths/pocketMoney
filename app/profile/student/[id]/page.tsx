@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { ArrowLeft, UserCircle, Receipt } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
-export default async function StudentProfile({ params }: { params: { id: string } }) {
+export default async function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const student = await prisma.person.findFirst({
-        where: { id: params.id, role: 'STUDENT' },
+        where: { id, role: 'STUDENT' },
         include: {
             expensesAsDebtor: {
                 include: { creditor: true },

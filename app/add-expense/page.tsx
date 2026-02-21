@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { addExpense } from '@/app/actions/db'
 import Link from 'next/link'
 import { ArrowLeft, Send } from 'lucide-react'
+import { redirect } from 'next/navigation'
 
 export default async function AddExpense() {
     const people = await prisma.person.findMany({
@@ -24,6 +25,7 @@ export default async function AddExpense() {
                 <form action={async (formData: FormData) => {
                     'use server'
                     await addExpense(formData)
+                    redirect('/')
                 }} className="space-y-5">
                     <div className="space-y-2">
                         <label htmlFor="debtorId" className="text-sm font-medium text-slate-700">Who owes money? (Debtor)</label>
@@ -31,9 +33,10 @@ export default async function AddExpense() {
                             name="debtorId"
                             id="debtorId"
                             required
+                            defaultValue=""
                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         >
-                            <option value="" disabled selected>Select a person</option>
+                            <option value="" disabled>Select a person</option>
                             {allPeople.map((p: any) => (
                                 <option key={p.id} value={p.id}>{p.name} ({p.role.toLowerCase()})</option>
                             ))}
@@ -46,9 +49,10 @@ export default async function AddExpense() {
                             name="creditorId"
                             id="creditorId"
                             required
+                            defaultValue=""
                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         >
-                            <option value="" disabled selected>Select a teacher</option>
+                            <option value="" disabled>Select a teacher</option>
                             {teachers.map((t: any) => (
                                 <option key={t.id} value={t.id}>{t.name}</option>
                             ))}

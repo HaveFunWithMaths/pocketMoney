@@ -39,6 +39,7 @@ export default async function EditExpense({ params }: { params: Promise<{ id: st
                 <form action={async (formData) => {
                     'use server'
                     await editExpense(expense.id, formData)
+                    redirect('/')
                 }} className="space-y-5">
                     <div className="space-y-2">
                         <label htmlFor="amount" className="text-sm font-medium text-slate-700">Amount (₹)</label>

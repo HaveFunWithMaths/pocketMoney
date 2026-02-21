@@ -48,7 +48,6 @@ export default async function EditExpense({ params }: { params: Promise<{ id: st
                             name="amount"
                             id="amount"
                             required
-                            min="1"
                             step="0.01"
                             defaultValue={expense.amount}
                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"

@@ -31,7 +31,7 @@ export async function addExpense(formData: FormData) {
     const amountStr = formData.get('amount') as string
     const amount = parseFloat(amountStr)
 
-    if (!debtorId || !creditorId || isNaN(amount) || amount <= 0) {
+    if (!debtorId || !creditorId || isNaN(amount) || amount === 0) {
         return { error: 'Invalid input fields' }
     }
 
@@ -105,7 +105,7 @@ export async function editExpense(id: string, formData: FormData) {
     const amount = parseFloat(amountStr)
     const description = formData.get('description') as string | undefined
 
-    if (isNaN(amount) || amount <= 0) return { error: 'Invalid amount' }
+    if (isNaN(amount) || amount === 0) return { error: 'Invalid amount' }
 
     try {
         const expense = await prisma.expense.update({

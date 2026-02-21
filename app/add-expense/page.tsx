@@ -3,6 +3,7 @@ import { addExpense } from '@/app/actions/db'
 import Link from 'next/link'
 import { ArrowLeft, Send } from 'lucide-react'
 import { redirect } from 'next/navigation'
+import { SearchableSelect } from './SearchableSelect'
 
 export default async function AddExpense() {
     const people = await prisma.person.findMany({
@@ -10,7 +11,7 @@ export default async function AddExpense() {
     })
 
     const teachers = people.filter((p: any) => p.role === 'TEACHER')
-    const allPeople = people // Anyone can be a debtor
+    const students = people.filter((p: any) => p.role === 'STUDENT')
 
     return (
         <div className="p-4 space-y-6 pb-20">
@@ -27,24 +28,18 @@ export default async function AddExpense() {
                     await addExpense(formData)
                     redirect('/')
                 }} className="space-y-5">
-                    <div className="space-y-2">
-                        <label htmlFor="debtorId" className="text-sm font-medium text-slate-700">Who owes money? (Debtor)</label>
-                        <select
+                    <div className="space-y-2 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                        <label htmlFor="debtorId" className="text-sm font-semibold text-slate-800">Who owes money? (Student)</label>
+                        <SearchableSelect
                             name="debtorId"
-                            id="debtorId"
+                            options={students}
+                            placeholder="Select a student"
                             required
-                            defaultValue=""
-                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        >
-                            <option value="" disabled>Select a person</option>
-                            {allPeople.map((p: any) => (
-                                <option key={p.id} value={p.id}>{p.name} ({p.role.toLowerCase()})</option>
-                            ))}
-                        </select>
+                        />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="creditorId" className="text-sm font-medium text-slate-700">Who is owed money? (Creditor - Teachers Only)</label>
+                    <div className="space-y-2 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                        <label htmlFor="creditorId" className="text-sm font-semibold text-slate-800">Who is owed money? (Teacher)</label>
                         <select
                             name="creditorId"
                             id="creditorId"

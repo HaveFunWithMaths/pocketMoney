@@ -16,6 +16,7 @@ export async function addPerson(formData: FormData) {
             data: { name: name.trim(), role },
         })
         revalidatePath('/')
+        revalidatePath('/add-expense')
         revalidatePath('/manage/teachers')
         revalidatePath('/manage/students')
         return { success: true, person }
@@ -72,6 +73,7 @@ export async function editPerson(id: string, formData: FormData) {
             data: { name: name.trim() }
         })
         revalidatePath('/')
+        revalidatePath('/add-expense')
         revalidatePath('/manage/teachers')
         revalidatePath('/manage/students')
         return { success: true, person }
@@ -89,6 +91,7 @@ export async function deletePerson(id: string) {
             where: { id }
         })
         revalidatePath('/')
+        revalidatePath('/add-expense')
         revalidatePath('/manage/teachers')
         revalidatePath('/manage/students')
         return { success: true }

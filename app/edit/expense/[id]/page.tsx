@@ -1,12 +1,14 @@
 import { prisma } from '@/lib/prisma'
-import { editExpense } from '@/app/actions/db'
+import { editExpense, deleteExpense } from '@/app/actions/db'
 import Link from 'next/link'
-import { ArrowLeft, Save } from 'lucide-react'
-import { notFound } from 'next/navigation'
+import { ArrowLeft, Save, Trash } from 'lucide-react'
+import { notFound, redirect } from 'next/navigation'
 
-export default async function EditExpense({ params }: { params: { id: string } }) {
+export default async function EditExpense({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+
     const expense = await prisma.expense.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: { debtor: true, creditor: true }
     })
 
@@ -67,6 +69,17 @@ export default async function EditExpense({ params }: { params: { id: string } }
                     <button type="submit" className="w-full flex justify-center items-center gap-2 bg-slate-900 text-white font-semibold py-3 rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-sm">
                         <Save className="w-5 h-5" />
                         Save Changes
+                    </button>
+                </form>
+
+                <form action={async () => {
+                    'use server'
+                    await deleteExpense(expense.id)
+                    redirect('/')
+                }}>
+                    <button type="submit" className="w-full flex justify-center items-center gap-2 bg-red-50 text-red-600 font-semibold py-3 rounded-xl hover:bg-red-100 active:scale-[0.98] transition-all shadow-sm mt-4 border border-red-100">
+                        <Trash className="w-5 h-5" />
+                        Delete Transaction
                     </button>
                 </form>
             </div>
